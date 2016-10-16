@@ -1,0 +1,23 @@
+{
+  "name": "labrador-test",
+  "version": "0.5.0",
+  "description": "微信小程序模块化开发框架，Labrador自动化测试基础库",
+  "keywords": [
+    "labrador"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maichong/labrador-test.git"
+  },
+  "author": {
+    "email": "liang@maichong.it",
+    "name": "liang",
+    "url": "https://github.com/liangxingchen"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maichong/labrador-test/issues"
+  },
+  "homepage": "https://github.com/maichong/labrador-test#readme"
+}
