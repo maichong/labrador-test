@@ -200,14 +200,16 @@ function TestComponent(Component, tests, testFile) {
       }
       var runner = function () {
         var me = this;
-        var args = arguments;
+        var args = Array.prototype.slice.call(arguments);
         var onError = function (error) {
           print(testFile + '#' + name + ' 测试失败 ' + error.stack, 'red');
         };
+        var res;
         try {
-          var res = test.call(me, me, function () {
+          let testArgs = [me, function () {
             return fn.apply(me, args);
-          });
+          }].concat(args);
+          res = test.apply(me, testArgs);
           if (res && res.then) {
             res.then(function () {
               print(testFile + '#' + name + ' 测试通过', 'green');
@@ -219,9 +221,10 @@ function TestComponent(Component, tests, testFile) {
           onError(error);
         }
         runner = fn;
+        return res;
       };
       Component.prototype[name] = function () {
-        runner.apply(this, arguments);
+        return runner.apply(this, arguments);
       };
     }
   });
