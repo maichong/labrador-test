@@ -6,13 +6,13 @@
 
 /* eslint no-use-before-define:0 new-cap:0 */
 
-var tasks = [];
-var current = null;
+let tasks = [];
+let current = null;
 
-var start = Date.now();
+let start = Date.now();
 
-var totalSuccess = 0;
-var totalError = 0;
+let totalSuccess = 0;
+let totalError = 0;
 
 function print(message, color) {
   color = color || '#333';
@@ -35,7 +35,7 @@ function check() {
     return;
   }
   console.log('\n---------------------------------------\n\n');
-  current(function () {
+  current(() => {
     current = null;
     setTimeout(check, 100);
   });
@@ -52,7 +52,7 @@ function Test(Component, tests, testFile) {
     && Component.default.prototype
     && Component.default.prototype._init
   ) {
-    var res = {};
+    let res = {};
     res.default = TestComponent(Component.default, tests, testFile);
     Object.defineProperty(res, '__esModule', { value: true });
     return res;
@@ -63,18 +63,18 @@ function Test(Component, tests, testFile) {
 function TestLibrary(Library, tests, testFile) {
   function testTask(done) {
     print('开始测试库 ' + testFile, '#05f');
-    var queue = [];
-    Object.keys(tests).forEach(function (name) {
+    let queue = [];
+    Object.keys(tests).forEach((name) => {
       if (/^test/.test(name)) {
-        queue.push({ name: name, fn: tests[name] });
+        queue.push({ name, fn: tests[name] });
       } else {
         print(testFile + ' 测试文件存在无效导出 ' + name, '#ca2');
       }
     });
 
-    var name = '';
-    var success = 0;
-    var errors = 0;
+    let name = '';
+    let success = 0;
+    let errors = 0;
 
     function onError(error) {
       print(testFile + '#' + name + ' 测试失败 ' + error.stack, 'red');
@@ -84,7 +84,7 @@ function TestLibrary(Library, tests, testFile) {
     }
 
     function run() {
-      var test = queue.shift();
+      let test = queue.shift();
       if (!test) {
         print(testFile + ' 中的test函数测试已完成,' + success + '通过,' + errors + '失败', errors ? 'red' : 'green');
         done();
@@ -93,9 +93,9 @@ function TestLibrary(Library, tests, testFile) {
       name = test.name;
 
       try {
-        var res = test.fn(Library);
+        let res = test.fn(Library);
         if (res && res.then) {
-          res.then(function () {
+          res.then(() => {
             success++;
             totalSuccess++;
             run();
@@ -118,23 +118,23 @@ function TestLibrary(Library, tests, testFile) {
 }
 
 function TestComponent(Component, tests, testFile) {
-  var onReady = Component.prototype.onReady;
+  let onReady = Component.prototype.onReady;
 
-  var functions = ['onLoad', 'onReady', 'onShow', 'onHide', 'onUnload', 'onPullDownRefreash'];
-  var invalidHandles = [];
+  let functions = ['onLoad', 'onReady', 'onShow', 'onHide', 'onUnload', 'onPullDownRefreash'];
+  let invalidHandles = [];
   Component.prototype.onReady = function () {
-    var me = this;
+    let me = this;
     if (onReady) {
       onReady.call(me);
     }
 
     function testTask(done) {
       print('开始测试组件 ' + testFile, '#2ab');
-      var queue = [];
-      Object.keys(tests).forEach(function (name) {
+      let queue = [];
+      Object.keys(tests).forEach((name) => {
         if (/^test/.test(name)) {
           queue.push({
-            name: name,
+            name,
             fn: tests[name]
           });
         } else if (!/^handle/.test(name) && functions.indexOf(name) === -1) {
@@ -142,13 +142,13 @@ function TestComponent(Component, tests, testFile) {
         }
       });
 
-      invalidHandles.forEach(function (name) {
+      invalidHandles.forEach((name) => {
         print(testFile + ' 存在测试函数' + name + ',但是不存在对应的组件方法', '#ca2');
       });
 
-      var success = 0;
-      var errors = 0;
-      var name = '';
+      let success = 0;
+      let errors = 0;
+      let name = '';
 
       function onError(error) {
         print(testFile + '#' + name + ' 测试失败 ' + error.stack, 'red');
@@ -158,7 +158,7 @@ function TestComponent(Component, tests, testFile) {
       }
 
       function run() {
-        var test = queue.shift();
+        let test = queue.shift();
         if (!test) {
           print(testFile + ' 中的test函数测试已完成,' + success + '通过,' + errors + '失败', errors ? 'red' : 'green');
           done();
@@ -167,9 +167,9 @@ function TestComponent(Component, tests, testFile) {
         name = test.name;
 
         try {
-          var res = test.fn(me);
+          let res = test.fn(me);
           if (res && res.then) {
-            res.then(function () {
+            res.then(() => {
               success++;
               totalSuccess++;
               run();
@@ -190,21 +190,21 @@ function TestComponent(Component, tests, testFile) {
     tasks.push(testTask);
   };
 
-  Object.keys(tests).forEach(function (name) {
+  Object.keys(tests).forEach((name) => {
     if (functions.indexOf(name) > -1 || /^handle/.test(name)) {
-      var test = tests[name];
-      var fn = Component.prototype[name];
+      let test = tests[name];
+      let fn = Component.prototype[name];
       if (test && !fn) {
         invalidHandles.push(name);
         return;
       }
-      var runner = function () {
-        var me = this;
-        var args = Array.prototype.slice.call(arguments);
-        var onError = function (error) {
+      let runner = function () {
+        let me = this;
+        let args = Array.prototype.slice.call(arguments);
+        let onError = (error) => {
           print(testFile + '#' + name + ' 测试失败 ' + error.stack, 'red');
         };
-        var res;
+        let res;
         try {
           let testArgs = [me, function () {
             return fn.apply(me, args);
